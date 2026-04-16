@@ -1,0 +1,2 @@
+Asistívna aplikácia pre nevidiacich – bakalárska prácas
+Tento projekt predstavuje vývoj a implementáciu webovej aplikácie, ktorá umožňuje nevidiacim používateľom prístup k informáciám o ich prostredí prostredníctvom analýzy obrazu a hlasovej interakcie. Aplikácia využíva moderné technológie umelej inteligencie na popis prostredia, odpovedanie na otázky a poskytovanie jednoduchej hlasovej komunikácie.
