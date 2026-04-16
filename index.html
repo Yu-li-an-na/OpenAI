@@ -1,1 +1,176 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+    <meta charset="UTF-8">
+    <title>Asistent pre nevidiacich</title>
 
+    <style>
+        body {
+            margin: 0;
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+
+        #camera {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        #overlay {
+            position: fixed;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+        }
+
+        #status, #result {
+            font-size: 24px;
+            margin-top: 10px;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        #activate {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.75);
+            color: white;
+            font-size: 32px;
+            border: none;
+            z-index: 9999;
+        }
+
+        #keepalive {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 1px;
+            height: 1px;
+            opacity: 0;
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+<button id="activate">Aktivovať hlasové ovládanie</button>
+<button id="keepalive"></button>
+
+<video id="camera" autoplay playsinline></video>
+
+<div id="overlay">
+    <div id="status">Pripravené.</div>
+    <div id="result"></div>
+</div>
+
+<script>
+    const video = document.getElementById("camera");
+    const statusEl = document.getElementById("status");
+    const resultEl = document.getElementById("result");
+
+    let mode = "wake";
+    let userQuery = "";
+
+    async function startCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: "environment" }
+            });
+            video.srcObject = stream;
+        } catch (err) {
+            statusEl.textContent = "Kamera je blokovaná.";
+        }
+    }
+
+    startCamera();
+
+    function beepStart() {
+        new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...").play();
+    }
+
+    function beepEnd() {
+        new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEA...").play();
+    }
+
+    let rec = new webkitSpeechRecognition();
+    rec.lang = "sk-SK";
+    rec.continuous = true;
+    rec.interimResults = false;
+
+    rec.onresult = (event) => {
+        const text = event.results[event.results.length - 1][0].transcript.toLowerCase();
+
+        if (mode === "wake") {
+            if (text.includes("začni")) {
+                beepStart();
+                mode = "listen";
+                statusEl.textContent = "Počúvam tvoju otázku…";
+            }
+            return;
+        }
+
+        if (mode === "listen") {
+            userQuery = text;
+            beepEnd();
+            mode = "processing";
+            statusEl.textContent = "Spracovávam…";
+            captureAndAnalyze();
+        }
+    };
+
+    rec.onend = () => {
+        rec.start();
+    };
+
+    document.getElementById("activate").onclick = () => {
+        rec.start();
+        statusEl.textContent = "Povedz 'začni'.";
+        document.getElementById("activate").style.display = "none";
+    };
+
+    async function captureAndAnalyze() {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+
+        const imageDataUrl = canvas.toDataURL("image/jpeg");
+
+        const response = await fetch("/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: imageDataUrl, query: userQuery })
+        });
+
+        const data = await response.json();
+        resultEl.textContent = data.text;
+
+        rec.onend = null;
+        rec.stop();
+
+        const utter = new SpeechSynthesisUtterance(data.text);
+        utter.lang = "sk-SK";
+
+        utter.onend = () => {
+            rec.onend = () => rec.start();
+            rec.start();
+            mode = "wake";
+            statusEl.textContent = "Hotovo. Povedz 'začni'.";
+        };
+
+        speechSynthesis.speak(utter);
+    }
+</script>
+
+</body>
+</html>
