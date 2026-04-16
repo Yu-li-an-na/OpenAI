@@ -1,1 +1,96 @@
+from flask import Flask, request, jsonify, send_from_directory
+import requests
+import json
 
+API_KEY = "SEM_DAJ_SVOJ_OPENAI_KEY"
+
+app = Flask(__name__, static_folder="static")
+
+@app.route("/")
+def index():
+    return send_from_directory("static", "index.html")
+
+@app.route("/analyze", methods=["POST"])
+def analyze():
+    try:
+        data = request.get_json()
+        image_data = data["image"]
+        query = data.get("query", "")
+
+        header, encoded = image_data.split(",", 1)
+
+        url = "https://api.openai.com/v1/chat/completions"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {API_KEY}"
+        }
+
+        payload = {
+            "model": "gpt-4o-mini",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": (
+                                  "Analyzuj obrázok extrémne presne. "
+                                "Tvojou úlohou je pomáhať nevidiacemu používateľovi. "
+                                "Používaj jasné, stručné a orientačné opisy priestoru. "
+                                "Vždy odpovedaj podľa typu otázky nasledovne:\n\n"
+
+                                "1) Ak sa používateľ pýta na konkrétny predmet "
+                                "(napr. 'kde je pohár', 'nájdi ovládač'), "
+                                "vždy uveď presnú polohu objektu: "
+                                "'vľavo hore', 'vpravo dole', 'v strede', "
+                                "'na stole vpravo', 'pred televízorom', "
+                                "'pri okraji gauča', '20 cm od ľavého okraja stola'. "
+                                "Ak predmet nevidíš, povedz to jasne.\n\n"
+
+                                "2) Ak sa používateľ pýta na navigáciu "
+                                "(napr. 'čo je predo mnou', 'čo je napravo'), "
+                                "popíš priestor ako navigačný asistent: "
+                                "'Pred tebou je stôl, za ním televízor. "
+                                "Vpravo je kreslo. Vľavo je polica.'\n\n"
+
+                                "3) Ak sa pýta na všeobecný opis, popíš scénu stručne, "
+                                "ale informatívne.\n\n"
+
+                                "4) Ak sa pýta na viac objektov, popíš ich polohu "
+                                "relatívne k sebe.\n\n"
+                                f"Odpovedz na otázku: {query}"
+                            )
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{encoded}"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+
+        response = requests.post(url, headers=headers, data=json.dumps(payload))
+
+        try:
+            data = response.json()
+        except:
+            return jsonify({"text": "Chyba: OpenAI nevrátilo platnú odpoveď."})
+
+        if "error" in data:
+            err = data["error"].get("message", "Neznáma chyba.")
+            return jsonify({"text": f"OpenAI chyba: {err}"})
+
+        try:
+            text = data["choices"][0]["message"]["content"]
+            return jsonify({"text": text})
+        except:
+            return jsonify({"text": "Chyba: odpoveď neobsahuje 'choices'. Pravdepodobne zlý API kľúč alebo model."})
+
+    except Exception as e:
+        return jsonify({"text": f"Chyba: {str(e)}"})
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
