@@ -1,4 +1,4 @@
-# 👁️‍🗨️ **VYUŽITIE OPENAI NA POPIS OKOLIA PRE  NEVIDIACICH**
+# 👁 **VYUŽITIE OPENAI NA POPIS OKOLIA PRE  NEVIDIACICH**
  Tento projekt predstavuje vývoj a implementáciu webovej aplikácie, ktorá umožňuje nevidiacim používateľom prístup k informáciám o ich prostredí prostredníctvom analýzy obrazu a hlasovej interakcie. Aplikácia využíva moderné technológie umelej inteligencie na popis prostredia, odpovedanie na otázky a poskytovanie jednoduchej hlasovej komunikácie.
 ## 📌 **Popis projektu**
 Systém umožňuje používateľovi nasnímať obrázok alebo položiť hlasovú otázku prostredníctvom webového prehliadača. Frontend potom odošle obrázok a textový dopyt do backendu, ktorý ich spracuje a odošle službe umelej inteligencie. API vráti popis prostredia, identifikáciu objektu alebo odpoveď na dopyt. Aplikácia je navrhnutá tak, aby bola čo najprístupnejšia a najpoužívateľsky prívetivejšia pre nevidiacich používateľov. Zahŕňa hlasové ovládanie, hlasové prehrávanie odpovedí, analýzu obrazu pomocou umelej inteligencie, jednoduché webové rozhranie a spracovanie obrazu Base64.
