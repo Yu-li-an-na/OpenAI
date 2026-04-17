@@ -34,31 +34,29 @@ def analyze():
                         {
                             "type": "text",
                             "text": (
-                                  "Analyzuj obrázok extrémne presne. "
-                                "Tvojou úlohou je pomáhať nevidiacemu používateľovi. "
-                                "Používaj jasné, stručné a orientačné opisy priestoru. "
-                                "Vždy odpovedaj podľa typu otázky nasledovne:\n\n"
+                                "Analyzuj obrázok extrémne presne. 
+                                Tvojou úlohou je pomáhať nevidiacemu používateľovi. 
+                                Používaj jasné, stručné a orientačné opisy priestoru.
+                                Ak sa používateľ pýta na konkrétny predmet 
+                                (napr. 'kde je pohár', 'nájdi ovládač'), 
+                                uveď presnú polohu objektu (napr. 'vľavo hore', 'v strede', 
+                                'na stole vpravo'). Ak predmet nevidíš, povedz to jasne.
 
-                                "1) Ak sa používateľ pýta na konkrétny predmet "
-                                "(napr. 'kde je pohár', 'nájdi ovládač'), "
-                                "vždy uveď presnú polohu objektu: "
-                                "'vľavo hore', 'vpravo dole', 'v strede', "
-                                "'na stole vpravo', 'pred televízorom', "
-                                "'pri okraji gauča', '20 cm od ľavého okraja stola'. "
-                                "Ak predmet nevidíš, povedz to jasne.\n\n"
+                                Ak sa používateľ pýta na navigáciu 
+                                (napr. 'čo je predo mnou', 'čo je napravo'), 
+                                popíš priestor ako navigačný asistent 
+                                (napr. 'Pred tebou je stôl, vpravo je kreslo').
 
-                                "2) Ak sa používateľ pýta na navigáciu "
-                                "(napr. 'čo je predo mnou', 'čo je napravo'), "
-                                "popíš priestor ako navigačný asistent: "
-                                "'Pred tebou je stôl, za ním televízor. "
-                                "Vpravo je kreslo. Vľavo je polica.'\n\n"
+                                Ak sa pýta na všeobecný opis, popíš scénu stručne, 
+                                ale informatívne.
 
-                                "3) Ak sa pýta na všeobecný opis, popíš scénu stručne, "
-                                "ale informatívne.\n\n"
+                                Ak sa pýta na viac objektov, popíš ich polohu 
+                                relatívne k sebe.
 
-                                "4) Ak sa pýta na viac objektov, popíš ich polohu "
-                                "relatívne k sebe.\n\n"
-                                f"Odpovedz na otázku: {query}"
+                                Nikdy nepoužívaj číslované zoznamy ani odrážky. 
+                                Odpovedaj iba v súvislom texte.
+
+                                Odpovedz na otázku: {query}"
                             )
                         },
                         {
